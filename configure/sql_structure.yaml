@@ -5,3 +5,5 @@ video:
 		service: string
 		url: string
 		data: text
+	extensions:
+		- taxonomy
