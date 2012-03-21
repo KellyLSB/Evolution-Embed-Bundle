@@ -7,21 +7,30 @@ use e;
 
 class Bundle extends SQLBundle {
 
-	public function embedCode($url) {
+	public $parser;
 
+	public function __initBundle() {
+		$this->parser = new Parser;
 	}
 
-	//http://vimeo.com/26292088
-	//http://www.youtube.com/watch?v=NyRZNNEnkQc
-	//http://youtu.be/NyRZNNEnkQc
+	public function __callBundle($url) {
+		return $this->parser->url($url);
+	}
+
+	public function parser() {
+		return $this->parser;
+	}
+
+	public function load($id) {
+		return $this->parser->load($id);
+	}
+
+	public function getEmbedCode($url, $width = null, $height = null, $extra = array()) {
+		return $this->parser->url($url)->embed($width, $height, $extra);
+	}
 
 	public function route() {
-		$parser = new Parser;
-		//dump($parser->load(3)->embed());
-		$get = e::$input->get;
-
-		$parser->url("http://www.youtube.com/watch?v=NyRZNNEnkQc&pizza=something");
-		dump($parser);
+		dump(e::embed("http://vimeo.com/25193154")->embed(200,300));
 
 		e\Complete();
 	}

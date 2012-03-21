@@ -7,7 +7,7 @@ urls:
 		request: "{id}"
 	www.youtube.com:
 		service: youtube
-		request: "watch?v={id}&pizza={anothervar}"
+		request: "watch?v={id}"
 	youtube.com:
 		service: youtube
 		request: "watch?v={id}"
@@ -19,6 +19,6 @@ urls:
 		request: "{id}"
 services:
 	youtube:
-		embed: "<youtube src="{id}" />"
+		embed: "<iframe width="{width}" height="{height}" src="http://www.youtube.com/embed/{id}" frameborder="0" allowfullscreen></iframe>"
 	vimeo:
-		embed: "<vimeo src="{id}" />"
+		embed: "<iframe src="http://player.vimeo.com/video/{id}?title=0&amp;byline=0&amp;portrait=0" width="{width}" height="{height}" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>"

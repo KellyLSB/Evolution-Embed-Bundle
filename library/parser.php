@@ -4,10 +4,6 @@ namespace Bundles\Embed;
 use Exception;
 use e;
 
-//http://vimeo.com/26292088
-//http://www.youtube.com/watch?v=NyRZNNEnkQc
-//http://youtu.be/NyRZNNEnkQc
-
 class Parser {
 
 	/**
@@ -122,14 +118,18 @@ class Parser {
 		return $vid;
 	}
 
-	public function embed() {
+	public function embed($width = null, $height = null, $extra = array()) {
 		if(!isset($this->services['services']))
 			throw new Exception("Service info array does not exist in `services.yaml`");
 		if(!isset($this->services['services'][$this->service]))
 			throw new Exception("`$this->service` info array does not exist in `services.yaml`");
 
 		$embed_code = $this->services['services'][$this->service]['embed'];
-		foreach($this->parsed as $key => $val)
+		$data = array_merge($this->parsed, $extra,
+			!is_null($width) ? array('width' => $width) : array(),
+			!is_null($height) ? array('height' => $height) : array()
+		);
+		foreach($data as $key => $val)
 			$embed_code = str_replace('{'.$key.'}', $val, $embed_code);
 
 		return $embed_code;
@@ -174,6 +174,8 @@ class Parser {
 			 */
 			$var = str_replace(array($piece, '{', '}'), '', $var);
 
+			///////////////////////////
+			///////////Break///////////
 			///////////////////////////
 
 			/**
