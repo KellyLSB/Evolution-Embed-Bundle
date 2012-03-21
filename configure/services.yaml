@@ -1,0 +1,24 @@
+urls:
+	www.youtu.be:
+		service: youtube
+		request: "{id}"
+	youtu.be:
+		service: youtube
+		request: "{id}"
+	www.youtube.com:
+		service: youtube
+		request: "watch?v={id}&pizza={anothervar}"
+	youtube.com:
+		service: youtube
+		request: "watch?v={id}"
+	www.vimeo.com:
+		service: vimeo
+		request: "{id}"
+	vimeo.com:
+		service: vimeo
+		request: "{id}"
+services:
+	youtube:
+		embed: "<youtube src="{id}" />"
+	vimeo:
+		embed: "<vimeo src="{id}" />"

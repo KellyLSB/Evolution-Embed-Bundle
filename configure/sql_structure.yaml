@@ -1,0 +1,7 @@
+video:
+	singular: video
+	plural: videos
+	fields:
+		service: string
+		url: string
+		data: text
