@@ -19,6 +19,6 @@ urls:
 		request: "{id}"
 services:
 	youtube:
-		embed: "<iframe width="{width}" height="{height}" src="http://www.youtube.com/embed/{id}" frameborder="0" allowfullscreen></iframe>"
+		embed: "<iframe width="{width}" height="{height}" src="http://www.youtube.com/embed/{id}?wmode=transparent" frameborder="0" allowfullscreen></iframe>"
 	vimeo:
 		embed: "<iframe src="http://player.vimeo.com/video/{id}?title=0&amp;byline=0&amp;portrait=0" width="{width}" height="{height}" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>"

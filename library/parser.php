@@ -17,6 +17,7 @@ class Parser {
 	 * @author Kelly Becker
 	 */
 	public $url;
+	public $hash;
 	public $domain;
 	public $request;
 
@@ -42,6 +43,7 @@ class Parser {
 		 * @author Kelly Becker
 		 */
 		$this->url = $url;
+		$this->hash = md5($url);
 
 		/**
 		 * Remove Protocol
@@ -113,6 +115,7 @@ class Parser {
 		$vid = e::$embed->newVideo();
 		$vid->data = serialize($this->parsed);
 		$vid->service = $this->service;
+		$vid->hash = md5($this->url);
 		$vid->url = $this->url;
 		$vid->save();
 		return $vid;
