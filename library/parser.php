@@ -73,6 +73,7 @@ class Parser {
 		 */
 		foreach($this->services['urls'] as $domain => $info) {
 			if($domain == $this->domain) break;
+			if('www.'.$domain == $this->domain) break;
 			unset($domain, $info);
 		}
 

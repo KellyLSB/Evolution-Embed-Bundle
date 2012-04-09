@@ -1,19 +1,10 @@
 urls:
-	www.youtu.be:
-		service: youtube
-		request: "{id}"
 	youtu.be:
 		service: youtube
 		request: "{id}"
-	www.youtube.com:
-		service: youtube
-		request: "watch?v={id}"
 	youtube.com:
 		service: youtube
 		request: "watch?v={id}"
-	www.vimeo.com:
-		service: vimeo
-		request: "{id}"
 	vimeo.com:
 		service: vimeo
 		request: "{id}"
