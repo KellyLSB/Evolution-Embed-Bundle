@@ -129,10 +129,13 @@ class Parser {
 		return json_decode(file_get_contents($json_url));
 	}
 
-	public function title() {
+	public function __call($func, $args) {
 		$jsonLocs = $this->checkServices('jsonLocs');
 
-		$toTitle = empty($jsonLocs['title']) ? array() : explode('->', $jsonLocs['title']);
+		if(!isset($jsonLocs[$func]))
+			throw new Exception("`$func` is currently not accessible on via a method. It may be available via `info` (returns the raw API result from $this->service).");
+
+		$toTitle = empty($jsonLocs[$func]) ? array() : explode('->', $jsonLocs[$func]);
 		$info = $this->info();
 
 		$ret = $info;
