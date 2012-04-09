@@ -30,7 +30,9 @@ class Bundle extends SQLBundle {
 	}
 
 	public function route() {
-		echo e::embed("http://vimeo.com/25193154")->embed(500,300);
+		// http://www.youtube.com/watch?v=3hf41GKdL_k&feature=g-all-f&context=G2acf0e9FAAAAAAAAAAA
+		// http://vimeo.com/25193154
+		dump(e::embed("http://vimeo.com/25193154")->title());
 
 		e\Complete();
 	}

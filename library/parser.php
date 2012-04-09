@@ -121,13 +121,47 @@ class Parser {
 		return $vid;
 	}
 
-	public function embed($width = null, $height = null, $extra = array()) {
-		if(!isset($this->services['services']))
-			throw new Exception("Service info array does not exist in `services.yaml`");
-		if(!isset($this->services['services'][$this->service]))
-			throw new Exception("`$this->service` info array does not exist in `services.yaml`");
+	public function info() {
+		$json_url = $this->checkServices('json');
+		foreach($this->parsed as $key => $val)
+			$json_url = str_replace('{'.$key.'}', $val, $json_url);
 
-		$embed_code = $this->services['services'][$this->service]['embed'];
+		return json_decode(file_get_contents($json_url));
+	}
+
+	public function title() {
+		$jsonLocs = $this->checkServices('jsonLocs');
+
+		$toTitle = empty($jsonLocs['title']) ? array() : explode('->', $jsonLocs['title']);
+		$info = $this->info();
+
+		$ret = $info;
+		foreach($toTitle as $to) {
+
+			if(!isset($ret->$to)) {
+				switch ($to) {
+					case '(pop)':
+						$ret = array_pop($ret);
+					break;
+					case '(shift)':
+						$ret = array_shift($ret);
+					break;
+					
+					default:
+					break;
+				}
+
+				continue;
+			}
+
+			$ret = $ret->$to;
+		}
+
+		return $ret;
+	}
+
+	public function embed($width = null, $height = null, $extra = array()) {
+		$embed_code = $this->checkServices('embed');
 		$data = array_merge($this->parsed, $extra,
 			!is_null($width) ? array('width' => $width) : array(),
 			!is_null($height) ? array('height' => $height) : array()
@@ -205,6 +239,17 @@ class Parser {
 		
 		$request = $return;
 
+	}
+
+	private function checkServices($info = false) {
+		if(!isset($this->services['services']))
+			throw new Exception("Service info array does not exist in `services.yaml`");
+		if(!isset($this->services['services'][$this->service]))
+			throw new Exception("`$this->service` info array does not exist in `services.yaml`");
+		if($info && !isset($this->services['services'][$this->service][$info]))
+			throw new Exception("`$info` does not exist on `$this->service` info array in `services.yaml`");
+
+		return $this->services['services'][$this->service][$info];
 	}
 
 }
