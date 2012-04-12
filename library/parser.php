@@ -150,11 +150,8 @@ class Parser {
 		/**
 		 * Set information that can be customized but is based of the API
 		 */
-		try {
-			$vid->name = $this->name($apiData);
-			$vid->description = $this->description($apiData);
-		}
-		catch(Exception $e) {}
+		$vid->title = $this->title($apiData);
+		$vid->description = $this->description($apiData);
 
 		/**
 		 * Save and return the model
@@ -195,7 +192,13 @@ class Parser {
 		/**
 		 * If we already have the data in a db model and we didnt specify to use the api
 		 */
-		if(!empty($this->video->$func) || (isset($args[0]) && $args[0] !== 'api'))
+		if(!empty($this->video->$func))
+			return $this->video->$func;
+
+		/**
+		 * Allow forcing of the api
+		 */
+		if(isset($args[0]) && $args[0] !== 'api')
 			return $this->video->$func;
 
 		/**
