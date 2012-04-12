@@ -33,6 +33,11 @@ class Parser {
 	 */
 	public $parsed;
 
+	/**
+	 * Video Object
+	 * @author Kelly Becker
+	 */
+
 	public function __construct() {
 		$this->services = e::$yaml->load(dirname(__DIR__).'/configure/services.yaml', true);
 	}
@@ -104,53 +109,147 @@ class Parser {
 		return $this;
 	}
 
+	/**
+	 * Load a saved video
+	 * @author Kelly Becker
+	 */
 	public function load($id) {
 		$vid = e::$embed->getVideo($id);
 		$this->parsed = unserialize($vid->data);
 		$this->service = $vid->service;
 		$this->url($vid->url);
+		$this->video = $vid;
 		return $this;
 	}
 
-	public function save() {
-		$vid = e::$embed->newVideo();
+	/**
+	 * Save a video to an object
+	 * @author Kelly Becker
+	 */
+	public function save($apiData = false) {
+
+		/**
+		 * If we already have a video loaded use its model
+		 */
+		if(!empty($this->video))
+			$vid = $this->video;
+
+		/**
+		 * If not then create a new model
+		 */
+		else $vid = e::$embed->newVideo();
+
+		/**
+		 * Set the normal data to the model
+		 */
 		$vid->data = serialize($this->parsed);
 		$vid->service = $this->service;
 		$vid->hash = md5($this->url);
 		$vid->url = $this->url;
+
+		/**
+		 * Set information that can be customized but is based of the API
+		 */
+		try {
+			$vid->name = $this->name($apiData);
+			$vid->description = $this->description($apiData);
+		}
+		catch(Exception $e) {}
+
+		/**
+		 * Save and return the model
+		 */
 		$vid->save();
 		return $vid;
 	}
 
+	/**
+	 * Returns a StdClass of the JSON API for the video information
+	 */
 	public function info() {
+
+		/**
+		 * Check if we have a json api for this service
+		 */
 		$json_url = $this->checkServices('json');
+
+		/**
+		 * Replace stuff in the api url for this video
+		 */
 		foreach($this->parsed as $key => $val)
 			$json_url = str_replace('{'.$key.'}', $val, $json_url);
 
+		/**
+		 * Return the api result in object format
+		 */
 		return json_decode(file_get_contents($json_url));
 	}
 
+	/**
+	 * Access to predefined variabled within the api
+	 * (e.g.) Name, Description, Age, Date uploaded, Etc.
+	 * @author Kelly Becker
+	 */
 	public function __call($func, $args) {
+
+		/**
+		 * If we already have the data in a db model and we didnt specify to use the api
+		 */
+		if(!empty($this->video->$func) || (isset($args[0]) && $args[0] !== 'api'))
+			return $this->video->$func;
+
+		/**
+		 * Make sure we got a map thorugh the json
+		 */
 		$jsonLocs = $this->checkServices('jsonLocs');
 
+		/**
+		 * If we dont have a map to the location of the requested variable
+		 * throw an exception
+		 */
 		if(!isset($jsonLocs[$func]))
 			throw new Exception("`$func` is currently not accessible on via a method. It may be available via `info` (returns the raw API result from $this->service).");
 
+		/**
+		 * Create an array representing the progression through the api object
+		 */
 		$toTitle = empty($jsonLocs[$func]) ? array() : explode('->', $jsonLocs[$func]);
+
+		/**
+		 * Get our api
+		 */
 		$info = $this->info();
 
+		/**
+		 * Start using the map
+		 */
 		$ret = $info;
 		foreach($toTitle as $to) {
 
+			/**
+			 * Handle functions within the map
+			 */
 			if(!isset($ret->$to)) {
 				switch ($to) {
+
+					/**
+					 * Array Pop
+					 */
 					case '(pop)':
 						$ret = array_pop($ret);
 					break;
+
+					/**
+					 * Array Shift
+					 */
 					case '(shift)':
 						$ret = array_shift($ret);
 					break;
 					
+					/**
+					 * If we dont recognize the function or request
+					 * Ignore it
+					 */
 					default:
 					break;
 				}
@@ -158,21 +257,46 @@ class Parser {
 				continue;
 			}
 
+			/**
+			 * Move up the object
+			 */
 			$ret = $ret->$to;
 		}
 
+		/**
+		 * Return the final result
+		 */
 		return $ret;
 	}
 
+	/**
+	 * Generate the embed code
+	 * @author Kelly Becker
+	 */
 	public function embed($width = null, $height = null, $extra = array()) {
+
+		/**
+		 * If the embed code doesnt exists error
+		 */
 		$embed_code = $this->checkServices('embed');
+
+		/**
+		 * Merge data into the array to be rendered
+		 */
 		$data = array_merge($this->parsed, $extra,
 			!is_null($width) ? array('width' => $width) : array(),
 			!is_null($height) ? array('height' => $height) : array()
 		);
+
+		/**
+		 * Start replaceing the strings
+		 */
 		foreach($data as $key => $val)
 			$embed_code = str_replace('{'.$key.'}', $val, $embed_code);
 
+		/**
+		 * Return the Embed Code
+		 */
 		return $embed_code;
 	}
 
@@ -245,6 +369,12 @@ class Parser {
 
 	}
 
+	/**
+	 * Make sire the services array exists
+	 * If not require it. Then make sure the requested service
+	 * exists and enfore that it and its requested key is available
+	 * @author Kelly Becker
+	 */
 	private function checkServices($info = false) {
 		if(!isset($this->services['services']))
 			throw new Exception("Service info array does not exist in `services.yaml`");

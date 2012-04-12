@@ -6,5 +6,7 @@ video:
 		url: string
 		data: text
 		hash: string
+		title: string
+		description: string
 	extensions:
 		- taxonomy
