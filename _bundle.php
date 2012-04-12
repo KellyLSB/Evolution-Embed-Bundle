@@ -33,7 +33,7 @@ class Bundle extends SQLBundle {
 		// http://www.youtube.com/watch?v=3hf41GKdL_k&feature=g-all-f&context=G2acf0e9FAAAAAAAAAAA
 		// http://vimeo.com/25193154
 		//dump(e::embed("http://vimeo.com/25193154")->save());
-		dump($this->getVideo(10)->parser()->title());
+		dump($this->getVideo(1)->parser()->save('api'));
 
 		e\Complete();
 	}
